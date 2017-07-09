@@ -2,5 +2,9 @@
   "extends": ["eslint:recommended", "google"],
   "rules": {
 
+  },
+  "env": {
+    "node": true,
+    "es6": true
   }
 }

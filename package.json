@@ -21,6 +21,7 @@
   "homepage": "https://github.com/BodyaFlesh/nodejs-practic#readme",
   "devDependencies": {
     "eslint": "^4.2.0",
-    "eslint-config-google": "^0.9.1"
+    "eslint-config-google": "^0.9.1",
+    "eslint-plugin-node": "^5.1.0"
   }
 }
