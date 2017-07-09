@@ -1,0 +1,26 @@
+{
+  "name": "nodejs-practic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BodyaFlesh/nodejs-practic.git"
+  },
+  "author": "BodyaFlesh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BodyaFlesh/nodejs-practic/issues"
+  },
+  "homepage": "https://github.com/BodyaFlesh/nodejs-practic#readme",
+  "devDependencies": {
+    "eslint": "^4.2.0",
+    "eslint-config-google": "^0.9.1"
+  }
+}
