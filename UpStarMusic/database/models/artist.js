@@ -1,1 +1,0 @@
-// Todo: Create Artist Model
