@@ -34,6 +34,23 @@ const server = http.createServer(function(req, res) {
     req.on("end", function() {
         buffer += decoder.end();
 
+        //choose the halder this request should go to. If one is not found, use the not found handler
+        var chosenHandler =
+            typeof router[trimmedPath] !== "undefined"
+                ? router[trimmedPath]
+                : handlers.notFound;
+
+        //construct the data object to send to the handler
+        var data = {
+            trimmedPath: trimmedPath,
+            queryStringObject: quertStringObject,
+            method: method,
+            headers: headers,
+            payload: buffer
+        };
+
+        // Route the request to the handler
+
         res.end("Hello world\n");
         console.log("Peyload", buffer);
     });
@@ -53,3 +70,22 @@ const server = http.createServer(function(req, res) {
 server.listen(3000, function() {
     console.log("The server is listening on port 3000 now");
 });
+
+//define the handlers
+var handlers = {};
+
+//sample heandler
+handlers.sample = function(data, callback) {
+    //callback a http status code, and a payload object
+    callback(406, { name: "sample handler" });
+};
+
+//not found handler
+handlers.notFound = function(data, callback) {
+    callback(404);
+};
+
+//define a request router
+var router = {
+    sample: headers.sample
+};
