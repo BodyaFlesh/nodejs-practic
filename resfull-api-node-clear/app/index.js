@@ -49,9 +49,25 @@ const server = http.createServer(function(req, res) {
             payload: buffer
         };
 
-        // Route the request to the handler
+        // Route the request to the handler specified in the router
+        chosenHandler(data, function(statusCode, payload) {
+            // Use the status code called back b the handler, or default to 200
+            statusCode = typeof statusCode == "number" ? statusCode : 200;
 
-        res.end("Hello world\n");
+            // use the payload called back by the handler, or default to an empty object
+            payload = typeof payload == "object" ? payload : {};
+
+            // Convert the payload to a string
+            var payloadString = JSON.stringify(payload);
+
+            // return response
+            res.writeHead(statusCode);
+            res.end(payloadString);
+
+            //log the request path
+            console.log("Returning this response: ", statusCode, payloadString);
+        });
+
         console.log("Peyload", buffer);
     });
 
@@ -87,5 +103,5 @@ handlers.notFound = function(data, callback) {
 
 //define a request router
 var router = {
-    sample: headers.sample
+    sample: handlers.sample
 };
