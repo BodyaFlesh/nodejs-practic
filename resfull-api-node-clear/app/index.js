@@ -4,12 +4,50 @@
 
 //Dependencies
 const http = require("http");
+const https = require("https");
 const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
 var config = require("./config");
+const fs = require("fs");
 
-//the server should respond to all requests with a string
-const server = http.createServer(function(req, res) {
+//Instatiate the http server
+const httpServer = http.createServer(function(req, res) {
+    unifuedServer(req, res);
+});
+
+//start the server
+httpServer.listen(config.httpPort, function() {
+    console.log(
+        "The server is listening on port " +
+            config.httpPort +
+            " in " +
+            config.envName +
+            " now"
+    );
+});
+
+//Instatiate the https server
+const httpsServerOptions = {
+    key: fs.readFileSync("./https/key.pem"),
+    cert: fs.readFileSync("./https/cert.pem")
+};
+const httpsServer = https.createServer(httpsServerOptions, function(req, res) {
+    unifuedServer(req, res);
+});
+
+//start the https server
+httpsServer.listen(config.httpsPort, function() {
+    console.log(
+        "The server is listening on port " +
+            config.httpsPort +
+            " in " +
+            config.envName +
+            " now"
+    );
+});
+
+// all the server logic for bith the http and https server
+var unifuedServer = function(req, res) {
     // Get the URL and parse it
     var parseUrl = url.parse(req.url, true);
 
@@ -72,28 +110,7 @@ const server = http.createServer(function(req, res) {
 
         console.log("Peyload", buffer);
     });
-
-    // Send the response
-    // res.end("Hello world\n");
-
-    // // Log the request path
-    // // console.log("request received on path:", trimmedPath);
-    // // console.log("Method:", method);
-    // // console.log(quertStringObject);
-
-    // console.log("Headers", headers);
-});
-
-//start the server
-server.listen(config.port, function() {
-    console.log(
-        "The server is listening on port " +
-            config.port +
-            " in " +
-            config.envName +
-            " now"
-    );
-});
+};
 
 //define the handlers
 var handlers = {};
