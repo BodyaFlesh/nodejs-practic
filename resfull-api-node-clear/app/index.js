@@ -9,13 +9,6 @@ const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
 const config = require("./config");
 const fs = require("fs");
-const _data = require("./lib/data");
-
-//testing
-// @TODO delete this
-_data.create("test", "newFile", { foo: "bar" }, function(err) {
-    console.log("this was the error", err);
-});
 
 //Instatiate the http server
 const httpServer = http.createServer(function(req, res) {
@@ -24,13 +17,7 @@ const httpServer = http.createServer(function(req, res) {
 
 //start the server
 httpServer.listen(config.httpPort, function() {
-    console.log(
-        "The server is listening on port " +
-            config.httpPort +
-            " in " +
-            config.envName +
-            " now"
-    );
+    console.log("The server is listening on port " + config.httpPort + " in " + config.envName + " now");
 });
 
 //Instatiate the https server
@@ -44,13 +31,7 @@ const httpsServer = https.createServer(httpsServerOptions, function(req, res) {
 
 //start the https server
 httpsServer.listen(config.httpsPort, function() {
-    console.log(
-        "The server is listening on port " +
-            config.httpsPort +
-            " in " +
-            config.envName +
-            " now"
-    );
+    console.log("The server is listening on port " + config.httpsPort + " in " + config.envName + " now");
 });
 
 // all the server logic for bith the http and https server
@@ -81,10 +62,7 @@ var unifuedServer = function(req, res) {
         buffer += decoder.end();
 
         //choose the halder this request should go to. If one is not found, use the not found handler
-        var chosenHandler =
-            typeof router[trimmedPath] !== "undefined"
-                ? router[trimmedPath]
-                : handlers.notFound;
+        var chosenHandler = typeof router[trimmedPath] !== "undefined" ? router[trimmedPath] : handlers.notFound;
 
         //construct the data object to send to the handler
         var data = {
