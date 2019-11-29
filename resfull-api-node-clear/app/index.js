@@ -9,6 +9,7 @@ const url = require("url");
 const StringDecoder = require("string_decoder").StringDecoder;
 const config = require("./config");
 const fs = require("fs");
+const handlers = require("./lib/handlers");
 
 //Instatiate the http server
 const httpServer = http.createServer(function(req, res) {
@@ -97,26 +98,8 @@ var unifuedServer = function(req, res) {
     });
 };
 
-//define the handlers
-var handlers = {};
-
-//sample heandler
-// handlers.sample = function(data, callback) {
-//     //callback a http status code, and a payload object
-//     callback(406, { name: "sample handler" });
-// };
-
-//not found handler
-handlers.notFound = function(data, callback) {
-    callback(404);
-};
-
-//ping handler
-handlers.ping = function(data, callback) {
-    callback(200);
-};
-
 //define a request router
 var router = {
-    ping: handlers.ping
+    ping: handlers.ping,
+    users: handlers.users
 };
