@@ -4,11 +4,12 @@
 
 // dependencies
 const crypto = require("crypto");
-const config = require("../config");
+const config = require("./config");
 
 // Container for all the helpers
 var helpers = {};
 
+// create a SHA256 hash
 helpers.hash = function(str) {
     if (typeof str == "string" && str.length > 0) {
         let hash = crypto
@@ -21,5 +22,15 @@ helpers.hash = function(str) {
     }
 };
 
+// Parse a JSON string to an object in all cases, without throwing
+helpers.parseJsonToObject = function(str) {
+    try {
+        var obj = JSON.parse(str);
+        return obj;
+    } catch (e) {
+        return {};
+    }
+};
+
 //export the module
-module.export = helpers;
+module.exports = helpers;
