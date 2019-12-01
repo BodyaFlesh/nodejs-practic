@@ -5,6 +5,8 @@
 // dependencies
 const crypto = require("crypto");
 const config = require("./config");
+const https = require("https");
+const querystring = require("querystring");
 
 // Container for all the helpers
 var helpers = {};
@@ -51,6 +53,62 @@ helpers.createRandomString = function(strLength) {
         return str;
     } else {
         return false;
+    }
+};
+
+//Send an SMS message via Twilio
+helpers.sendTwilioSms = function(phone, msg, callback) {
+    // validate parameters
+    phone = typeof phone == "string" && phone.trim().length == 10 ? phone.trim() : false;
+    msg = typeof msg == "string" && msg.trim().length > 0 && msg.trim().length <= 1600 ? msg.trim() : false;
+    if (phone && msg) {
+        // Configure the request payload
+        var payload = {
+            From: config.twilio.fromPhone,
+            To: "+1" + phone,
+            Body: msg
+        };
+
+        // stringify the payload
+        let stringPayload = querystring.stringify(payload);
+
+        // configure the request details
+        let requestDetails = {
+            protocol: "https:",
+            hostname: "api.twilio.com",
+            method: "POST",
+            path: "/2010-04-01/Accounts/" + config.twilio.accountSid + "/Messages.json",
+            auth: config.twilio.accountSid + ":" + config.twilio.authToken,
+            headers: {
+                "Content-type": "application/x-www-urlencoded",
+                "Content-length": Buffer.byteLength(stringPayload)
+            }
+        };
+
+        // Instatiation the request object
+        let req = https.request(requestDetails, function(res) {
+            // Grab the status of the sent request
+            let status = res.statusCode;
+            // callback successfully if the request went through
+            if (status == 200 || status == 201) {
+                callback(false);
+            } else {
+                callback("Status code returned was " + status);
+            }
+        });
+
+        // Bind to the error event so it doesn't get thrown
+        req.on("error", function(e) {
+            callback(e);
+        });
+
+        // And the payload
+        req.write(stringPayload);
+
+        // End the request
+        req.end();
+    } else {
+        callback("Given parameters were missing or invalid");
     }
 };
 
