@@ -75,18 +75,27 @@ server.unifuedServer = function(req, res) {
         };
 
         // Route the request to the handler specified in the router
-        chosenHandler(data, function(statusCode, payload) {
+        chosenHandler(data, function(statusCode, payload, contentType) {
+            // Determine the type of response (fallback to JSON)
+            contentType = typeof contentType == "string" ? contentType : "json";
+
             // Use the status code called back b the handler, or default to 200
             statusCode = typeof statusCode == "number" ? statusCode : 200;
 
-            // use the payload called back by the handler, or default to an empty object
-            payload = typeof payload == "object" ? payload : {};
+            // return the response-parts that are content-specific
+            let payloadString = "";
+            if (contentType == "json") {
+                res.setHeader("Content-Type", "application/json");
+                // use the payload called back by the handler, or default to an empty object
+                payload = typeof payload == "object" ? payload : {};
+                payloadString = JSON.stringify(payload);
+            }
+            if (contentType == "html") {
+                res.setHeader("Content-Type", "text/html");
+                payloadString = typeof payload == "string" ? payload : "";
+            }
 
-            // Convert the payload to a string
-            var payloadString = JSON.stringify(payload);
-
-            // return response
-            res.setHeader("Content-Type", "application/json");
+            // return the response-parts that are common to all content-types
             res.writeHead(statusCode);
             res.end(payloadString);
 
@@ -100,22 +109,31 @@ server.unifuedServer = function(req, res) {
 
 //define a request router
 server.router = {
+    "": handlers.index,
+    "account/create": handlers.accountCreate,
+    "account/edit": handlers.accountEdit,
+    "account/deleted": handlers.accountDeleted,
+    "session/create": handlers.sessionCreate,
+    "session/deleted": handlers.sessionDeleted,
+    "checks/all": handlers.checksList,
+    "checks/create": handlers.checksCreate,
+    "checks/edit": handlers.checksEdit,
     ping: handlers.ping,
-    users: handlers.users,
-    tokens: handlers.tokens,
-    checks: handlers.checks
+    "api/users": handlers.users,
+    "api/tokens": handlers.tokens,
+    "api/checks": handlers.checks
 };
 
 // Init script
 server.init = function() {
     //start the HTTP server
     server.httpServer.listen(config.httpPort, function() {
-        console.log("The server is listening on port " + config.httpPort + " in " + config.envName + " now");
+        console.log("\x1b[36m%s\x1b[0m", "The server is listening on port " + config.httpPort + " in " + config.envName + " now");
     });
 
     //start the HTTPS server
     server.httpsServer.listen(config.httpsPort, function() {
-        console.log("The server is listening on port " + config.httpsPort + " in " + config.envName + " now");
+        console.log("\x1b[35m%s\x1b[0m", "The server is listening on port " + config.httpPort + " in " + config.envName + " now");
     });
 };
 

@@ -11,6 +11,8 @@ const http = require("http");
 const helpers = require("./helpers");
 const url = require("url");
 const _logs = require("./logs");
+const util = require("util");
+const debug = util.debuglog("workers");
 
 // Instantiate the worker object
 var workers = {};
@@ -282,6 +284,9 @@ workers.logRotationLoop = function() {
 
 // Init script
 workers.init = function() {
+    // Send to console, in yellow
+    console.log("\x1b[33m%s\x1b[0m", "Background workers are running");
+
     // Execute all the checks immediately
     workers.gatherAllChecks();
 
