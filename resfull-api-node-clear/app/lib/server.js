@@ -65,6 +65,9 @@ server.unifuedServer = function(req, res) {
         //choose the halder this request should go to. If one is not found, use the not found handler
         var chosenHandler = typeof server.router[trimmedPath] !== "undefined" ? server.router[trimmedPath] : handlers.notFound;
 
+        // If the request is within the public directory
+        chosenHandler = trimmedPath.indexOf("public/") > -1 ? handlers.public : chosenHandler;
+
         //construct the data object to send to the handler
         var data = {
             trimmedPath: trimmedPath,
@@ -79,28 +82,57 @@ server.unifuedServer = function(req, res) {
             // Determine the type of response (fallback to JSON)
             contentType = typeof contentType == "string" ? contentType : "json";
 
-            // Use the status code called back b the handler, or default to 200
+            // Use the status code returned from the handler, or set the default status code to 200
             statusCode = typeof statusCode == "number" ? statusCode : 200;
 
-            // return the response-parts that are content-specific
-            let payloadString = "";
+            // Return the response parts that are content-type specific
+            var payloadString = "";
             if (contentType == "json") {
                 res.setHeader("Content-Type", "application/json");
-                // use the payload called back by the handler, or default to an empty object
                 payload = typeof payload == "object" ? payload : {};
                 payloadString = JSON.stringify(payload);
             }
+
             if (contentType == "html") {
                 res.setHeader("Content-Type", "text/html");
                 payloadString = typeof payload == "string" ? payload : "";
             }
 
-            // return the response-parts that are common to all content-types
+            if (contentType == "favicon") {
+                res.setHeader("Content-Type", "image/x-icon");
+                payloadString = typeof payload !== "undefined" ? payload : "";
+            }
+
+            if (contentType == "plain") {
+                res.setHeader("Content-Type", "text/plain");
+                payloadString = typeof payload !== "undefined" ? payload : "";
+            }
+
+            if (contentType == "css") {
+                res.setHeader("Content-Type", "text/css");
+                payloadString = typeof payload !== "undefined" ? payload : "";
+            }
+
+            if (contentType == "png") {
+                res.setHeader("Content-Type", "image/png");
+                payloadString = typeof payload !== "undefined" ? payload : "";
+            }
+
+            if (contentType == "jpg") {
+                res.setHeader("Content-Type", "image/jpeg");
+                payloadString = typeof payload !== "undefined" ? payload : "";
+            }
+
+            // Return the response-parts common to all content-types
             res.writeHead(statusCode);
             res.end(payloadString);
 
-            //log the request path
-            console.log("Returning this response: ", statusCode, payloadString);
+            // If the response is 200, print green, otherwise print red
+            // if (statusCode == 200) {
+            //     debug("\x1b[32m%s\x1b[0m", method.toUpperCase() + " /" + trimmedPath + " " + statusCode);
+            // } else {
+            //     debug("\x1b[31m%s\x1b[0m", method.toUpperCase() + " /" + trimmedPath + " " + statusCode);
+            // }
         });
 
         console.log("Peyload", buffer);
@@ -121,7 +153,9 @@ server.router = {
     ping: handlers.ping,
     "api/users": handlers.users,
     "api/tokens": handlers.tokens,
-    "api/checks": handlers.checks
+    "api/checks": handlers.checks,
+    "favicon.ico": handlers.favicon,
+    public: handlers.public
 };
 
 // Init script
