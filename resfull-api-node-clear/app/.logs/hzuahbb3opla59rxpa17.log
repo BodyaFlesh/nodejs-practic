@@ -1,0 +1,1 @@
+{"check":{"id":"hzuahbb3opla59rxpa17","userPhone":"0962276724","protocol":"http","url":"twitter.com","method":"put","successCodes":[200,201],"timeoutSeconds":2,"state":"down","lastChecked":false},"outcome":{"error":false,"responseCode":301},"state":"down","alert":false,"time":1575577798762}
