@@ -20,14 +20,113 @@ handlers.index = function(data, callback) {
     if (data.method == "get") {
         // Prepare data for interpolation
         let templateData = {
-            "head.title": "This is the title",
-            "head.description": "This is the meta description",
-            "head.title": "Hello templated world!",
+            "head.title": "Uptime Monitoring - Made Simple",
+            "head.description":
+                "We offer free, simple uptime monitoring for HTTP/HTTPS sites all kinds. When your site goes down, we'll send you a text to let you know.",
             "body.class": "index"
         };
 
         // Read in a template as a string
         helpers.getTemplate("index", templateData, function(err, str) {
+            if (!err && str) {
+                // Add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, function(err, str) {
+                    console.log({ err, str });
+                    if (!err && str) {
+                        // Return that page as HTML
+                        callback(200, str, "html");
+                    } else {
+                        callback(500, undefined, "html");
+                    }
+                });
+            } else {
+                callback(500, undefined, "html");
+            }
+        });
+    } else {
+        callback(405, undefined, "html");
+    }
+};
+
+// Create account
+handlers.accountCreate = function(data, callback) {
+    // reject any request that isn't a GET
+    if (data.method == "get") {
+        // Prepare data for interpolation
+        let templateData = {
+            "head.title": "Create an Account",
+            "head.description": "Sugnup is easy and only takes a few seconds.",
+            "body.class": "accountCreate"
+        };
+
+        // Read in a template as a string
+        helpers.getTemplate("accountCreate", templateData, function(err, str) {
+            if (!err && str) {
+                // Add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, function(err, str) {
+                    console.log({ err, str });
+                    if (!err && str) {
+                        // Return that page as HTML
+                        callback(200, str, "html");
+                    } else {
+                        callback(500, undefined, "html");
+                    }
+                });
+            } else {
+                callback(500, undefined, "html");
+            }
+        });
+    } else {
+        callback(405, undefined, "html");
+    }
+};
+
+// Create new session
+handlers.sessionCreate = function(data, callback) {
+    // reject any request that isn't a GET
+    if (data.method == "get") {
+        // Prepare data for interpolation
+        let templateData = {
+            "head.title": "Login to your account",
+            "head.description": "Please enter ...",
+            "body.class": "sessionCreate"
+        };
+
+        // Read in a template as a string
+        helpers.getTemplate("sessionCreate", templateData, function(err, str) {
+            if (!err && str) {
+                // Add the universal header and footer
+                helpers.addUniversalTemplates(str, templateData, function(err, str) {
+                    console.log({ err, str });
+                    if (!err && str) {
+                        // Return that page as HTML
+                        callback(200, str, "html");
+                    } else {
+                        callback(500, undefined, "html");
+                    }
+                });
+            } else {
+                callback(500, undefined, "html");
+            }
+        });
+    } else {
+        callback(405, undefined, "html");
+    }
+};
+
+// Session has been deleted
+handlers.sessionDeleted = function(data, callback) {
+    // reject any request that isn't a GET
+    if (data.method == "get") {
+        // Prepare data for interpolation
+        let templateData = {
+            "head.title": "Logout",
+            "head.description": "You have been logged",
+            "body.class": "sessionDeleted"
+        };
+
+        // Read in a template as a string
+        helpers.getTemplate("sessionDeleted", templateData, function(err, str) {
             if (!err && str) {
                 // Add the universal header and footer
                 helpers.addUniversalTemplates(str, templateData, function(err, str) {
