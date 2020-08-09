@@ -1,0 +1,13 @@
+version: '3'
+services: 
+    database:
+        image: 'mongo'
+        container_name: 'mongo-natours'
+        ports:
+            - 27017:27017
+        environment:
+            - MONGO_INITDB_DATABASE=natours
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=secret
+            #ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            #ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
