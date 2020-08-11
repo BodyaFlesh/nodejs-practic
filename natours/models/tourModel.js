@@ -90,7 +90,7 @@ tourSchema.pre(/^find/, function (next) {
     next();
 });
 
-tourSchema.post(/^find/)
+// tourSchema.post(/^find/)
 
 const Tour = mongoose.model('Tour', tourSchema);
 
