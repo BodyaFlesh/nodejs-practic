@@ -4,7 +4,11 @@ const app = require('./app');
 
 dotenv.config({ path: './config.env' });
 
-console.log(process.env.DATABASE);
+process.on('uncaughtException', err => {
+    console.log('uncaught Exception! Shutting down...');
+    console.log(err.name, err.message);
+    process.exit(1);
+});
 
 mongoose.connect(process.env.DATABASE, {
     useNewUrlParser: true,
@@ -24,8 +28,8 @@ const server = app.listen(port, () => {
 
 
 process.on('unhandledRejection', err => {
-    console.log(err.name, err.message);
     console.log('Unhandler rejection! Shutting down...');
+    console.log(err.name, err.message);
     server.close(() => {
         process.exit(1);
     });
