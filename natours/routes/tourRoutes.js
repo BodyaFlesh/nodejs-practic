@@ -9,6 +9,7 @@ const {
     getTourStats,
     getMounthlyPlan
 } = require('../controllers/tourController');
+const { protect } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router
     .get(getMounthlyPlan);
 
 router.route('/')
-    .get(getAllTours)
+    .get(protect, getAllTours)
     .post(createTour);
 
 router.route('/:id')
