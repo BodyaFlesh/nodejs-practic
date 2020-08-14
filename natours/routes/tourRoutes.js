@@ -9,7 +9,7 @@ const {
     getTourStats,
     getMounthlyPlan
 } = require('../controllers/tourController');
-const { protect } = require('../controllers/authController');
+const { protect, restrictTo } = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -32,6 +32,6 @@ router.route('/')
 router.route('/:id')
     .get(getTour)
     .patch(updateTour)
-    .delete(deleteTour);
+    .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router;
