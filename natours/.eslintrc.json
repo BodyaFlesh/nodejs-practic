@@ -5,7 +5,6 @@
     "prettier/prettier": "error",
     "spaced-comment": "off",
     "no-console": "warn",
-    "indent": ["error", 4],
     "consistent-return": "off",
     "func-names": "off",
     "object-shorthand": "off",
