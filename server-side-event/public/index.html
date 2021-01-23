@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>SSE App</title>
+</head>
+
+<body>
+  <p>Home page</p>
+
+<script>
+    const eventSource = new EventSource('/events')
+    eventSource.onmessage = event => {
+      console.log('Received event', event)
+    }
+</script>
+</body>
+</html>
