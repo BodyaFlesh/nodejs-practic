@@ -1,0 +1,27 @@
+version: '3'
+services:
+    #postgress DB
+    db:
+        image: postgres:11.8
+        container_name: postgress-jwt-authentication
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=123456789
+            - POSTGRES_DB=jwt-authentication
+        networks:
+            - app-network
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - "9090:8080"
+        networks:
+            - app-network
+#Docker Networks
+networks:
+    app-network:
+        driver: bridge
