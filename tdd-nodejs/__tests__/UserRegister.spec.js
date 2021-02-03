@@ -121,11 +121,11 @@ describe("User Registration", () => {
         expect(body.validationErrors.username).toBe("Must have min 4 and max 32 characters");
     })
 
-    it("returns E-mail is use when same email is already in use", async() => {
-        await User.create(validUser);
-        const response = await postUser(validUser);
+    // it("returns E-mail is use when same email is already in use", async() => {
+    //     await User.create(validUser);
+    //     const response = await postUser(validUser);
 
-        expect(response.body.validationErrors.email).toBe('E-mail in use');
-    })
+    //     expect(response.body.validationErrors.email).toBe('E-mail in use');
+    // })
     
 })
