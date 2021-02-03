@@ -1,8 +1,11 @@
 const Sequelize = require('sequelize');
+const config = require('config');
 
-const sequelize = new Sequelize("hoaxify", "serv_root", "jsdgw351;o94", {
-    dialect: "mysql",
-    logging: false
+const dbConfig = config.get("database");
+
+const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+    dialect: dbConfig.dialect, 
+    logging: dbConfig.logging
 });
 
 module.exports = sequelize;
