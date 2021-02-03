@@ -5,6 +5,9 @@ import * as express from 'express';
 import { Request, Response } from 'express';
 import { RegisterDTO } from "./dto/requrest/register.dto";
 import { Database } from './database';
+import { PasswordHash } from './security/passwordHash';
+import { AuthenticationDTO } from "./dto/response/authentication.dto";
+import { UserDTO } from "./dto/response/user.dto";
 
 const app = express();
 
@@ -17,7 +20,7 @@ app.get("/", (req: Request, resp: Response) => {
     resp.send("Hello there!");
 })
 
-app.post("/register", (req: Request, resp: Response) => {
+app.post("/register", async (req: Request, resp: Response) => {
     try{
         const body: RegisterDTO = req.body;
 
@@ -27,13 +30,27 @@ app.post("/register", (req: Request, resp: Response) => {
         }
 
         //validate if the email is already being user
-        if(Database.userRepository.findOne({ email: body.email })){
+        if(await Database.userRepository.findOne({ email: body.email })){
             throw new Error("Email is already being used");
         }
         //store the user
         const user = new User();
         user.username = body.username;
         user.email = body.email;
+        user.password = await PasswordHash.hashPassword(body.password);
+        user.age = body.age;
+
+        await Database.userRepository.save(user);
+
+        const authenticationDTO: AuthenticationDTO = new AuthenticationDTO();
+        const userDTO: UserDTO = new UserDTO();
+        userDTO.username = user.username;
+        userDTO.email = user.email;
+        userDTO.age = user.age;
+
+        authenticationDTO.user = userDTO;
+
+        //implement token generation and refresh tokens
 
         resp.json({
             body,
