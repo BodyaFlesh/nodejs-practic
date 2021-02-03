@@ -1,0 +1,31 @@
+version: "2.4"
+services:
+    db:
+        image: mysql:5.7.32
+        container_name: db-tdd-node
+        restart: always
+        #volumes:
+            #- ./storage/data:/var/lib/postgresql/data:Z
+            #- ./storage:/var/lib/postgresql/data
+        environment:
+            - MYSQL_ROOT_PASSWORD=12451fsaf5hgh32
+            - MYSQL_DATABASE=hoaxify
+            - MYSQL_USER=serv_root
+            - MYSQL_PASSWORD=jsdgw351;o94
+        ports:
+             - 3306:3306
+        networks:
+            - back
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 9090:8080
+        networks:
+            - back
+
+networks:
+    back:
+        driver: bridge
+    front:
+        driver: bridge
