@@ -1,13 +1,13 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as mongoose from 'mongoose';
-import Controller from './interfaces/conroller.interface';
+import Controller from './interfaces/controller.interface';
 
 class App{
     public app: express.Application;
     public port: number;
 
-    constructor(controllers, Controller[]){
+    constructor(controllers: Controller[]){
         this.app = express();
 
         this.connectToTheDatabase();
