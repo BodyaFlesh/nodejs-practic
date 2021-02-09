@@ -5,7 +5,7 @@ function errorMiddleware(error: HttpException, request: Request, response: Respo
     const status = error.status || 500;
     const message = error.message || 'Something went wrong';
     response
-        .status(this.state)
+        .status(status)
         .send({
             status,
             message
