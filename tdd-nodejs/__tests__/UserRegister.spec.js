@@ -1,6 +1,8 @@
 const request = require('supertest');
 const app = require('../src/app');
 const User = require("../src/user/User");
+const en = require('../locales/en/translation.json');
+const tr = require('../locales/tr/translation.json');
 const sequelize = require('../src/config/database');
 const { response } = require('express');
 
@@ -128,4 +130,66 @@ describe("User Registration", () => {
     //     expect(response.body.validationErrors.email).toBe('E-mail in use');
     // })
     
-})
+});
+
+describe('Internationalization', () => {
+    it.each`
+        field         | value              | expectedMessage
+        ${'username'} | ${null}            | ${tr.username_null}
+        ${'username'} | ${'usr'}           | ${tr.username_size}
+        ${'username'} | ${'a'.repeat(33)}  | ${tr.username_size}
+        ${'email'}    | ${null}            | ${tr.email_null}
+        ${'email'}    | ${'mail.com'}      | ${tr.email_invalid}
+        ${'email'}    | ${'user.mail.com'} | ${tr.email_invalid}
+        ${'email'}    | ${'user@mail'}     | ${tr.email_invalid}
+        ${'password'} | ${null}            | ${tr.password_null}
+        ${'password'} | ${'P4ssw'}         | ${tr.password_size}
+        ${'password'} | ${'alllowercase'}  | ${tr.password_pattern}
+        ${'password'} | ${'ALLUPPERCASE'}  | ${tr.password_pattern}
+        ${'password'} | ${'1234567890'}    | ${tr.password_pattern}
+        ${'password'} | ${'lowerandUPPER'} | ${tr.password_pattern}
+        ${'password'} | ${'lower4nd5667'}  | ${tr.password_pattern}
+        ${'password'} | ${'UPPER44444'}    | ${tr.password_pattern}
+    `(
+      'returns $expectedMessage when $field is $value when language is set as turkish',
+      async ({ field, expectedMessage, value }) => {
+            const user = {
+                username: 'user1',
+                email: 'user1@mail.com',
+                password: 'P4ssword',
+            };
+            user[field] = value;
+            const response = await postUser(user, { language: 'tr' });
+            const body = response.body;
+            expect(body.validationErrors[field]).toBe(expectedMessage);
+        }
+    );
+  
+    it(`returns ${tr.email_inuse} when same email is already in use when language is set as turkish`, async () => {
+        await User.create({ ...validUser });
+        const response = await postUser({ ...validUser }, { language: 'tr' });
+        expect(response.body.validationErrors.email).toBe(tr.email_inuse);
+    });
+  
+    it(`returns success message of ${tr.user_create_success} when signup request is valid and language is set as turkish`, async () => {
+        const response = await postUser({ ...validUser }, { language: 'tr' });
+        expect(response.body.message).toBe(tr.user_create_success);
+    });
+  
+    it(`returns ${tr.email_failure} message when sending email fails and language is set as turkish`, async () => {
+        simulateSmtpFailure = true;
+        const response = await postUser({ ...validUser }, { language: 'tr' });
+        expect(response.body.message).toBe(tr.email_failure);
+    });
+    it(`returns ${tr.validation_failure} message in error response body when validation fails`, async () => {
+        const response = await postUser(
+            {
+                username: null,
+                email: validUser.email,
+                password: 'P4ssword',
+            },
+            { language: 'tr' }
+        );
+        expect(response.body.message).toBe(tr.validation_failure);
+    });
+  });
