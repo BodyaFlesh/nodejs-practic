@@ -192,4 +192,4 @@ describe('Internationalization', () => {
         );
         expect(response.body.message).toBe(tr.validation_failure);
     });
-  });
+});
