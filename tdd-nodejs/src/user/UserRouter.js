@@ -15,7 +15,7 @@ router.post('/api/1.0/users',
         const errors = validationResult(req);
         if(!errors.isEmpty()){
             const validationErrors = {};
-            errors.array().forEach(error => validationErrors[error.param] = request.t(error.msg));
+            errors.array().forEach(error => validationErrors[error.param] = req.t(error.msg));
             return res.status(400).send({validationErrors});
         }
 
