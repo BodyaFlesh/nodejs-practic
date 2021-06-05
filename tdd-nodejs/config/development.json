@@ -1,9 +1,0 @@
-{
-    "database" : {
-        "database" : "hoaxify",
-        "username" : "serv_root",
-        "password" : "jsdgw351;o94",
-        "dialect" : "mysql",
-        "logging" : false
-    }
-}
