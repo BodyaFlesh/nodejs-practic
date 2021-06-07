@@ -52,8 +52,8 @@ describe('User Registration', () => {
         // query user table
         User.findAll().then((userList) => {
           const savedUser = userList[0];
-          expect(savedUser.username).toBe("user1");
-          expect(savedUser.email).toBe("user1@mail.com");
+          expect(savedUser.username).toBe('user1');
+          expect(savedUser.email).toBe('user1@mail.com');
         });
         done();
       });
