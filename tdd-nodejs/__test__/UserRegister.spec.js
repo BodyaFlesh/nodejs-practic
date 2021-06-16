@@ -68,8 +68,7 @@ describe('User Registration', () => {
       email: 'user1@mail.com',
       password: 'P4ssword',
     });
-    const body = response.body;
-    expect(body.validationErrors).toBe(400);
+    expect(response.status).toBe(400);
   });
 
   it('returns Username cannot be null when username is null', async () => {
@@ -99,6 +98,6 @@ describe('User Registration', () => {
       password: 'P4ssword',
     });
     const body = response.body;
-    expect(Object.keys(body.validationErrors)).toEquel(['username', 'email']);
+    expect(Object.keys(body.validationErrors)).toEqual(['username', 'email']);
   });
 });
