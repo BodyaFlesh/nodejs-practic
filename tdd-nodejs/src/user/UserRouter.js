@@ -1,4 +1,3 @@
-
 const express = require('express');
 const UserService = require('./UserService');
 const router = express.Router();
