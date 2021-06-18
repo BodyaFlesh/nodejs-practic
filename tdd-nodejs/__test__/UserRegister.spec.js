@@ -3,6 +3,7 @@ const app = require('../src/app');
 const User = require('../src/user/User');
 const sequelize = require('../src/config/database');
 const nodemailerStub = require('nodemailer-stub');
+const EmailService = require('../src/email/EmailService');
 
 beforeAll(() => {
   return sequelize.sync();
@@ -174,59 +175,83 @@ describe('User Registration', () => {
     const savedUser = users[0];
     expect(lastmail.content).toContain(savedUser.activationToken);
   });
-});
-
-describe('Internationalization', () => {
-  const username_null = 'Kullanıcı adı boş olamaz';
-  const username_size = 'En az 4 en fazla 32 karakter olmalı';
-  const email_null = 'E-Posta boş olamaz';
-  const email_invalid = 'E-Posta geçerli değil';
-  const password_null = 'Şifre boş olamaz';
-  const password_size = 'Şifre en az 6 karakter olmalı';
-  const password_pattern = 'Şifrede en az 1 büyük, 1 küçük harf ve 1 sayı bulunmalıdır';
-  const email_inuse = 'Bu E-Posta kullanılıyor';
-  const user_create_success = 'Kullanıcı oluşturuldu';
-
-  it.each`
-    field         | value              | expectedMessage
-    ${'username'} | ${null}            | ${username_null}
-    ${'username'} | ${'usr'}           | ${username_size}
-    ${'username'} | ${'a'.repeat(33)}  | ${username_size}
-    ${'email'}    | ${null}            | ${email_null}
-    ${'email'}    | ${'mail.com'}      | ${email_invalid}
-    ${'email'}    | ${'user.mail.com'} | ${email_invalid}
-    ${'email'}    | ${'user@mail'}     | ${email_invalid}
-    ${'password'} | ${null}            | ${password_null}
-    ${'password'} | ${'P4ssw'}         | ${password_size}
-    ${'password'} | ${'alllowercase'}  | ${password_pattern}
-    ${'password'} | ${'ALLUPPERCASE'}  | ${password_pattern}
-    ${'password'} | ${'1234567890'}    | ${password_pattern}
-    ${'password'} | ${'lowerandUPPER'} | ${password_pattern}
-    ${'password'} | ${'lower4nd5667'}  | ${password_pattern}
-    ${'password'} | ${'UPPER44444'}    | ${password_pattern}
-  `(
-    'returns $expectedMessage when $field is $value when language is set as turkish',
-    async ({ field, expectedMessage, value }) => {
-      const user = {
-        username: 'user1',
-        email: 'user1@mail.com',
-        password: 'P4ssword',
-      };
-      user[field] = value;
-      const response = await postUser(user, { language: 'tr' });
-      const body = response.body;
-      expect(body.validationErrors[field]).toBe(expectedMessage);
-    }
-  );
-
-  it(`returns ${email_inuse} when same email is already in use when language is set as turkish`, async () => {
-    await User.create({ ...validUser });
-    const response = await postUser({ ...validUser }, { language: 'tr' });
-    expect(response.body.validationErrors.email).toBe(email_inuse);
+  it('returns 502 Bad Gateway when sending email fails', async () => {
+    const mockSendAccountActivation = jest.spyOn(EmailService, 'sendAccountActivation')
+                                        .mockRejectedValue({ messsage: 'Failer to deliver email' });
+    const response = await postUser();
+    expect(response.status).toBe(502);
+    mockSendAccountActivation.mockRestore();
   });
 
-  it(`returns success message of ${user_create_success} when signup request is valid and language is set as turkish`, async () => {
-    const response = await postUser({ ...validUser }, { language: 'tr' });
-    expect(response.body.message).toBe(user_create_success);
+  it('returns Email failure message when sending email fails', async () => {
+    const mockSendAccountActivation = jest.spyOn(EmailService, 'sendAccountActivation')
+                                        .mockRejectedValue({ messsage: 'Failer to deliver email' });
+    const response = await postUser();
+    mockSendAccountActivation.mockRestore();
+    expect(response.body.message).toBe("E-mail Failure");
+  });
+
+  it('does not save user to database if activation email fails when sending email fails', async () => {
+    const mockSendAccountActivation = jest.spyOn(EmailService, 'sendAccountActivation')
+                                        .mockRejectedValue({ messsage: 'Failer to deliver email' });
+    await postUser();
+    mockSendAccountActivation.mockRestore();
+    const users = await User.findAll();
+    expect(users.length).toBe(0);
   });
 });
+
+// describe('Internationalization', () => {
+//   const username_null = 'Kullanıcı adı boş olamaz';
+//   const username_size = 'En az 4 en fazla 32 karakter olmalı';
+//   const email_null = 'E-Posta boş olamaz';
+//   const email_invalid = 'E-Posta geçerli değil';
+//   const password_null = 'Şifre boş olamaz';
+//   const password_size = 'Şifre en az 6 karakter olmalı';
+//   const password_pattern = 'Şifrede en az 1 büyük, 1 küçük harf ve 1 sayı bulunmalıdır';
+//   const email_inuse = 'Bu E-Posta kullanılıyor';
+//   const user_create_success = 'Kullanıcı oluşturuldu';
+
+//   it.each`
+//     field         | value              | expectedMessage
+//     ${'username'} | ${null}            | ${username_null}
+//     ${'username'} | ${'usr'}           | ${username_size}
+//     ${'username'} | ${'a'.repeat(33)}  | ${username_size}
+//     ${'email'}    | ${null}            | ${email_null}
+//     ${'email'}    | ${'mail.com'}      | ${email_invalid}
+//     ${'email'}    | ${'user.mail.com'} | ${email_invalid}
+//     ${'email'}    | ${'user@mail'}     | ${email_invalid}
+//     ${'password'} | ${null}            | ${password_null}
+//     ${'password'} | ${'P4ssw'}         | ${password_size}
+//     ${'password'} | ${'alllowercase'}  | ${password_pattern}
+//     ${'password'} | ${'ALLUPPERCASE'}  | ${password_pattern}
+//     ${'password'} | ${'1234567890'}    | ${password_pattern}
+//     ${'password'} | ${'lowerandUPPER'} | ${password_pattern}
+//     ${'password'} | ${'lower4nd5667'}  | ${password_pattern}
+//     ${'password'} | ${'UPPER44444'}    | ${password_pattern}
+//   `(
+//     'returns $expectedMessage when $field is $value when language is set as turkish',
+//     async ({ field, expectedMessage, value }) => {
+//       const user = {
+//         username: 'user1',
+//         email: 'user1@mail.com',
+//         password: 'P4ssword',
+//       };
+//       user[field] = value;
+//       const response = await postUser(user, { language: 'tr' });
+//       const body = response.body;
+//       expect(body.validationErrors[field]).toBe(expectedMessage);
+//     }
+//   );
+
+//   it(`returns ${email_inuse} when same email is already in use when language is set as turkish`, async () => {
+//     await User.create({ ...validUser });
+//     const response = await postUser({ ...validUser }, { language: 'tr' });
+//     expect(response.body.validationErrors.email).toBe(email_inuse);
+//   });
+
+//   it(`returns success message of ${user_create_success} when signup request is valid and language is set as turkish`, async () => {
+//     const response = await postUser({ ...validUser }, { language: 'tr' });
+//     expect(response.body.message).toBe(user_create_success);
+//   });
+// });
