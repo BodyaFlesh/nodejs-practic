@@ -213,6 +213,37 @@ describe('User Registration', () => {
   });
 });
 
+describe('Account activation', () => {
+  it('activates the account when correct token is sent', async () => {
+    await postUser();
+    let users = await User.findAll();
+    const token = users[0].activationToken;
+
+    await request(app).post('/api/1.0/users/token/' + token).send();
+    users = await User.findAll();
+    expect(users[0].inactive).toBe(false);
+  });
+
+  it('remove the token from user table after success activation', async () => {
+    await postUser();
+    let users = await User.findAll();
+    const token = users[0].activationToken;
+
+    await request(app).post('/api/1.0/users/token/' + token).send();
+    users = await User.findAll();
+    expect(users[0].activationToken).toBeFalsy();
+  });
+
+  it('does not activate the account when token is wrong', async () => {
+    await postUser();
+    const token = 'this-token-does-not-exist';
+
+    await request(app).post('/api/1.0/users/token/' + token).send();
+    const users = await User.findAll();
+    expect(users[0].inactive).tobe(true);
+  });
+});
+
 // describe('Internationalization', () => {
 //   const username_null = 'Kullanıcı adı boş olamaz';
 //   const username_size = 'En az 4 en fazla 32 karakter olmalı';

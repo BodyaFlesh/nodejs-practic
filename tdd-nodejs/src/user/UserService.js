@@ -26,9 +26,20 @@ const save = async (body) => {
 
 const findByEmail = async (email) => {
   return await User.findOne({ where: { email: email } });
+};
+
+const activate = async (token) => {
+  const user = await User.findOne({ where: { activationToken: token } });
+  if (!user) {
+    throw new InvalidTokenException();
+  }
+  user.inactive = false;
+  user.activationToken = null;
+  await user.save();
 }
 
 module.exports = {
   save,
   findByEmail,
+  activate,
 };
