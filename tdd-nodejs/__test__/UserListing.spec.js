@@ -70,14 +70,14 @@ describe('Listing Users', () => {
 
   it('returns second page users and page incicator when page in set as 1 in request parameter', async () => {
     await addUsers(11);
-    const response = await getUsers.query({ page: 1 });
+    const response = await getUsers().query({ page: 1 });
     expect(response.body.content[0].username).toBe('user10');
     expect(response.body.page).toBe(1);
   });
 
   it('returns first page when page is set below zero as request parameter', async () => {
     await addUsers(11);
-    const response = await getUsers.query({ page: -1 });
+    const response = await getUsers().query({ page: -1 });
     expect(response.body.content[0].username).toBe('user10');
     expect(response.body.page).toBe(0);
   });
